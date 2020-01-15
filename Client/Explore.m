@@ -27,7 +27,7 @@ try
     %ph = newplot
     
     %Write KO from Robot into MapData
-    file = fopen('MapData.txt', 'w');
+    file = fopen('+data\MapData.txt', 'w');
     % Main control loop. End with Ctrl + C in command line.
     while (true)
         
@@ -38,7 +38,7 @@ try
         ypositions = [ypositions; ry];
         %plot(xpositions, ypositions);
         
-        points = robot_controls.get_sensorreadings(sensorPose);
+        points = robot_controls.get_sensorreadings_worldframe(sensorPose);
        pl = length(points);
         setOccupancy(map, points/1000+10, ones(pl,1));
         subplot(2,1,1);
@@ -61,7 +61,7 @@ try
         %arrobot_setrotvel(1)
         
         pause(0.3);
-          save('testAsci.txt','points', '-ascii');
+          save('+data\testAsci.txt','points', '-ascii');
     end
     
     
