@@ -19,4 +19,3 @@ pause(0.5)
 % Reset estimated pose
 arrobot_resetpos()
 end
-
