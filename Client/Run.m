@@ -57,7 +57,7 @@ try
             case 'i'
                 [x, y, th] = arrobot_getpose
             case 'm'
-                pointcloud = robot_controls.get_sensorreadings(sensorPose);
+                pointcloud = robot_controls.get_sensorreadings_worldframe(sensorPose);
             case 'p'
                 pointcloud = utils.pad_control(controller, sensorPose);
                 %scatter(pointcloud(:, 1), pointcloud(:, 2), 'b*')
