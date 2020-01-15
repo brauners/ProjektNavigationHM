@@ -18,7 +18,7 @@ while true
     th = arrobot_getth;
     fprintf('%.2f\t %.2f\t %.2f\t\n', rx, ry, th);
     
-    points = robot_controls.get_sensorreadings(sensorPose);
+    points = robot_controls.get_sensorreadings_worldframe(sensorPose);
     if ~isempty(points)
         pointcloudx = [pointcloudx; points(:, 1)];
         pointcloudy = [pointcloudy; points(:, 2)];
