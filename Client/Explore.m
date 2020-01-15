@@ -3,11 +3,19 @@ addpath('..\..\ARIA_2.9.1 (64-bit)_matlab_precompiled');
 clear all
 addpath('..\..\ARIA_2.9.1 (64-bit)_matlab_precompiled');
 
-load('+data\sensorPose.mat')
+mode = "sim";
+
+if mode == "real"
+    load('+data\sensorPoseReal.mat')
+else
+    load('+data\sensorPose.mat')
+end
+
 map = robotics.BinaryOccupancyGrid(20, 30, 10);
 
 try
-    utils.init_robot('localhost', '8101');
+    % Initialisierung
+    utils.init_robot(mode);
     
     xpositions = [];
     ypositions = [];
