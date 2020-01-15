@@ -27,8 +27,8 @@ end
 end
 
 function [x, y] = koppel(posx, posy, theta, dist, angle)
-x = posx + dist * cosd(angle);
-y = posy + dist * sind(angle);
+x = posx + dist * cosd(angle+theta);
+y = posy + dist * sind(angle+theta);
 end
 
 
