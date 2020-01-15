@@ -3,13 +3,7 @@ function [pointcloud] = get_sensorreadings(sensorPose)
 %detected objects around the robot in body coordinate system of the robot
 %Unit is in mm
 
-% Check if the sensor definition fits to the robot in size
-n = arrobot_getnumsonar;
-n_input = length(sensorPose);
-if n ~= n_input
-    ME = MException('MATLAB:odearguments:InconsistentDataType', 'Wrong sensor definition');
-    throw(ME)
-end
+n = length(sensorPose);
 
 pointcloud = [];
 sensor_values = zeros(n, 1);
@@ -19,8 +13,8 @@ for i = 1 : n
     val = arrobot_getsonarrange(i-1);
     if val ~= 5000
         % Read estimated robot position
-        rx = arrobot_getx
-        ry = arrobot_gety
+        rx = arrobot_getx;
+        ry = arrobot_gety;
         th = arrobot_getth;
         
         [x, y] = koppel(rx, ry, th, val, sensorPose(i, 3));
