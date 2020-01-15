@@ -3,10 +3,17 @@ addpath('..\..\ARIA_2.9.1 (64-bit)_matlab_precompiled');
 clear all
 addpath('..\..\ARIA_2.9.1 (64-bit)_matlab_precompiled');
 
-load('+data\sensorPose.mat')
+mode = "sim";
+
+if mode == "real"
+    load('+data\sensorPoseReal.mat')
+else
+    load('+data\sensorPose.mat')
+end
+
 try
     % Initialisierung
-    utils.init_robot('localhost', '8101');
+    utils.init_robot(mode);
     
     
     % Main control loop. End with Ctrl + C in command line.
