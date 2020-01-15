@@ -13,12 +13,19 @@ while true
     arrobot_setvel(trans)
     arrobot_setrotvel(-rot)
     
+    rx = arrobot_getx;
+    ry = arrobot_gety;
+    th = arrobot_getth;
+    fprintf('%.2f\t %.2f\t %.2f\t\n', rx, ry, th);
+    
     points = robot_controls.get_sensorreadings(sensorPose);
-    pointcloudx = [pointcloudx; points(:, 1)];
-    pointcloudy = [pointcloudy; points(:, 2)];
-    scatter(pointcloudx, pointcloudy, 'b*')
+    if ~isempty(points)
+        pointcloudx = [pointcloudx; points(:, 1)];
+        pointcloudy = [pointcloudy; points(:, 2)];
+        scatter(pointcloudx, pointcloudy, 'b*')
+    end
 
-    fprintf('%.2f\t %.2f\t\n', trans, rot);
+    %fprintf('%.2f\t %.2f\t\n', trans, rot);
     
     if stop == 'X'
         arrobot_stop
