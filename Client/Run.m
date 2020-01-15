@@ -3,8 +3,16 @@ addpath('..\..\ARIA_2.9.1 (64-bit)_matlab_precompiled');
 clear all
 addpath('..\..\ARIA_2.9.1 (64-bit)_matlab_precompiled');
 
-controllerLibrary = NET.addAssembly([pwd '\SharpDX.XInput.dll']);
-myController = SharpDX.XInput.Controller(SharpDX.XInput.UserIndex.One);
+try
+    library = NET.addAssembly([pwd '\SharpDX.dll']);
+    controllerLibrary = NET.addAssembly([pwd '\SharpDX.XInput.dll']);
+ catch ex
+     ex.ExceptionObject.LoaderExceptions.Get(0).Message
+ end
+ 
+controller = SharpDX.XInput.Controller(SharpDX.XInput.UserIndex.One);
+
+
 
 mode = "sim";
 
@@ -50,6 +58,9 @@ try
                 [x, y, th] = arrobot_getpose
             case 'm'
                 pointcloud = robot_controls.get_sensorreadings(sensorPose);
+            case 'p'
+                pointcloud = utils.pad_control(controller, sensorPose);
+                %scatter(pointcloud(:, 1), pointcloud(:, 2), 'b*')
             case 'j'
                 while true
                     State = myController.GetState();
