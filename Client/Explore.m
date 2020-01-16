@@ -36,24 +36,16 @@ try
         subplot(2,1,1);
         show(map)
       
-%         type('testAcsi.txt')
-        
-       
         wallsx = [wallsx; points(:, 1)];
         wallsy = [wallsy; points(:, 2)];
         subplot(2,1,2);
         scatter(wallsx, wallsy, 'b*')
         hold on
         scatter(xpositions, ypositions, 'r*')
-        
         arrobot_setvel(150)
-        
-      fprintf(file, '%.4f %.4f\n', rx, ry);
-       
-        %arrobot_setrotvel(1)
-        
+        fprintf(file, '%.4f %.4f\n', rx, ry);
         pause(0.3);
-          save('testAsci.txt','points', '-ascii');
+        save('testAsci.txt','points', '-ascii');
     end
     
     
