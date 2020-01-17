@@ -7,7 +7,7 @@ function [point_world] = local_to_world_frame(point, angle, trans)
 R = [   cosd(angle) -sind(angle);
         sind(angle)  cosd(angle)];
 
-point_world = (R * point' + trans')';
+point_world = (R * point' + trans');
 
 point_world = point_world';
 end
