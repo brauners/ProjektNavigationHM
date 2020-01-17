@@ -55,11 +55,7 @@ try
         scatter(xpositions, ypositions, 'r*')
         
         arrobot_setvel(150)
-        
-      fprintf(file, '%.4f %.4f\n', rx, ry);
-       
-        %arrobot_setrotvel(1)
-        
+        fprintf(file, '%.4f %.4f\n', rx, ry);
         pause(0.3);
           save('+data\testAsci.txt','points', '-ascii');
     end

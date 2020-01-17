@@ -20,10 +20,12 @@ scatter(px, py, 'r*')
 hold on
 
 while(~targetReached)
-%     collision = robot_controls.collision_detection(500, sensorPose)
-%     if collision
-%         break;
-%     end
+    collision = robot_controls.collision_detection(300, sensorPose)
+    if collision
+        arrobot_stop
+        targetReached = false;
+        break;
+    end
     %Move forward to the target but check if angle gets off
     rx = arrobot_getx - startX;
     ry = arrobot_gety - startY;
