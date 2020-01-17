@@ -14,7 +14,13 @@ else
 end
 pause(0.5)
 % Make connection
-arrobot_connect()
+ connected = arrobot_connect();
+ 
+ if ~connected
+     ME = MException('MyComponent:noRobotConnection', 'No connection to robot possible. Check if running');
+     throw(ME)
+ end
+
 pause(0.5)
 % Reset estimated pose
 arrobot_resetpos()

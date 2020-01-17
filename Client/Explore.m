@@ -39,7 +39,7 @@ try
         %plot(xpositions, ypositions);
         
         points = robot_controls.get_sensorreadings_worldframe(sensorPose);
-       pl = length(points);
+        pl = length(points);
         setOccupancy(map, points/1000+10, ones(pl,1));
         subplot(2,1,1);
         show(map)
