@@ -1,21 +1,23 @@
-function [out, particles] = expected_home(particles, measurement, trans, rot)
+function [home, particles] = expected_home(particles, measurement, trans, rot, bodyfig)
 %FIND_HOME Summary of this function goes here
 % Particles initialized outside
 % Measurement on current position
 % Motion is robot movement to new position
-sigmaMeasurement = 100;
-mutateRandoms = 20;
-mutatePos = 200;
+sigmaMeasurement = 50;
+mutateRandoms = 0;
+mutatePos = 50;
 potSize = 10000;
 
+
+trans
 % Move each particle CONTRARY to robot motion
 % First rot then trans
 for i = 1 : length(particles)
-    particles(i, 1:2) = motion(particles(i, 1:2), -rot, -trans);
+    particles(i, 1:2) = motion(particles(i, 1:2), rot, trans);
 end
 
 % Calculate measurement to each particle
-particleDist = zeros(size(particles(:, 1)))
+particleDist = zeros(size(particles(:, 1)));
 for i = 1 : length(particles)
     particleDist(i) = eucl_dist([0 0], particles(i, 1:2));
 end
@@ -35,24 +37,23 @@ pot = fill_pot(particles, potSize);
 gen = make_generation(pot, size(particles,1));
 
 gen = mutate(gen, mutatePos, mutateRandoms);
-
-% Calculate estimated home
-out = [sum(particles(:, 1)), sum(particles(:, 1))];
-out = out / length(particles);
-
 particles = gen;
+% Calculate estimated home
+home = ransac(particles(:, 1:2));
 end
 
 function [point] = motion(point, angle, trans)
 % Angle must be in degrees
 
 % Define the rotation matrix
-R = [   cosd(angle) -sind(angle);
-        sind(angle)  cosd(angle)];
+H = [   cosd(angle) -sind(angle) trans(1);
+        sind(angle)  cosd(angle) trans(2);
+            0           0           1];
+    
 
-temp_point = R * point' + trans';
+temp_point = [inv(H) * [point, 1]']';
 
-point = temp_point';
+point = temp_point(1:2);
 end
 
 function dist = eucl_dist(left, right)
@@ -112,4 +113,42 @@ end
 
 end
 
+function [pos_est] = ransac(particles)
+%RANSAC Summary of this function goes here
+%   Detailed explanation goes here
+iterations = 10;
+range = 1;
+
+
+bestPos = 0;
+neighbours = 0;
+
+for i = 1 : iterations
+    particlesInRange = [];
+    % Choose one of the points randomly
+    r = floor(rand()*size(particles, 1))+1;
+    particle = particles(r, :);
+    
+    for p = 1 : size(particles, 1)
+        % Wenn die distanz kleiner als range --> nachbar
+        if eucl_dist(particle(1,1:2), particles(p, 1:2)) < range
+            particlesInRange = [particlesInRange; particles(p,:)];
+        end
+    end
+    if neighbours < size(particlesInRange, 1)
+        neighbours = size(particlesInRange, 1);
+        bestPos = mean_pos(particlesInRange(:, 1:2));
+    end
+end
+
+pos_est = bestPos';
+
+end
+
+function pos = mean_pos(positions)
+x = mean(positions(:, 1));
+y = mean(positions(:, 2));
+
+pos = [x; y];
+end
 
