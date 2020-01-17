@@ -31,10 +31,21 @@ global transBody;
 
 transBody = [0 0];
 
+worldFigure = figure();
+occupancyFigure = figure();
+
 
 try
     % Initialisierung
     utils.init_robot(mode);
+    
+    xpositions = [];
+    ypositions = [];
+    
+    wallsx = [];
+    wallsy = [];
+    
+    map = robotics.BinaryOccupancyGrid(30, 20, 10);
     
     particlesBody = utils.init_particle_filter(numberOfParticles);
     
@@ -53,7 +64,12 @@ try
         ry = arrobot_gety;
         th = arrobot_getth;
         
+        xpositions = [xpositions; rx];
+        ypositions = [ypositions; ry];
         
+        points = robot_controls.get_sensorreadings_worldframe(sensorPose);
+        wallsx = [wallsx; points(:, 1)];
+        wallsy = [wallsy; points(:, 2)];
         
         switch button
             case 'A'
@@ -63,7 +79,15 @@ try
                 fprintf('No functionality for %s\n', button);
                 
             case 'Y'
-                fprintf('No functionality for %s\n', button);
+                % Zeige die aufgenommenen Punkte in plot.
+                figure(worldFigure);
+                scatter(wallsx, wallsy, 'b*')
+                hold on
+                scatter(xpositions, ypositions, 'r*')
+                figure(occupancyFigure);
+                length_points = length(points);
+                setOccupancy(map, points/1000+10, ones(length_points,1));
+                show(map);
                 
             case 'Start'
                 fprintf('Start homing...\n')

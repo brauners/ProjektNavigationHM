@@ -15,7 +15,7 @@ rot = atan2(y, x) * 180/pi;
 
 transBody = homeBody/3;
 
-[homeReached] = robot_controls.move_to_target(transBody, currentSensorPose);
+[targetReached] = robot_controls.move_to_target(transBody, currentSensorPose);
 
 end
 
