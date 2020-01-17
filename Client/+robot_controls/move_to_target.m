@@ -16,8 +16,10 @@ py = target(2);
 
 
 while(~targetReached)
-    collision = robot_controls.collision_detection(4000, sensorPose)
+    collision = robot_controls.collision_detection(300, sensorPose)
     if collision
+        arrobot_stop
+        targetReached = false;
         break;
     end
     %Move forward to the target but check if angle gets off
