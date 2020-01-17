@@ -1,4 +1,4 @@
-function [home, particles] = expected_home(particles, measurement, trans, rot, bodyfig)
+function [home, particles] = expected_home(particles, measurement, trans, rot)
 %FIND_HOME Summary of this function goes here
 % Particles initialized outside
 % Measurement on current position
@@ -9,7 +9,6 @@ mutatePos = 50;
 potSize = 10000;
 
 
-trans
 % Move each particle CONTRARY to robot motion
 % First rot then trans
 for i = 1 : length(particles)

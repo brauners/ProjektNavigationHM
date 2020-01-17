@@ -14,13 +14,13 @@ targetReached = false;
 px = target(1);
 py = target(2);
 
-dts = [];8
-subplot(2,1,2)
-scatter(px, py, 'r*')
-hold on
+dts = [];
+% subplot(2,1,2)
+% scatter(px, py, 'r*')
+% hold on
 
 while(~targetReached)
-    collision = robot_controls.collision_detection(300, sensorPose)
+    collision = robot_controls.collision_detection(300, sensorPose);
     if collision
         arrobot_stop
         targetReached = false;
@@ -29,8 +29,8 @@ while(~targetReached)
     %Move forward to the target but check if angle gets off
     rx = arrobot_getx - startX;
     ry = arrobot_gety - startY;
-    subplot(2,1,2)
-    scatter(rx, ry, 'b*')
+%     subplot(2,1,2)
+%     scatter(rx, ry, 'b*')
     pause(0.2)
     
     d = sqrt( (px - rx)^2 + (py - ry)^2 );
@@ -39,23 +39,24 @@ while(~targetReached)
     dt =  (atan2(py - ry, px - rx) * (180/3.14159)) - rt;
     dt = mod((dt + 180), 360) - 180;
     dts = [dts; dt];
-    subplot(2,1,1);
-    plot(dts)
+%     subplot(2,1,1);
+%     plot(dts)
     
     %Turn towards the target if over threshold
     if abs(dt) > angleThresh
         arrobot_stop
         pause(0.4) %Give time to stop the motion
-        disp('angle off')
+        %disp('angle off')
         while abs(dt) > angleThresh
             arrobot_setrotvel(sign(dt)*10)
             %Update value
             rt = arrobot_getth - startT;
             dt =  (atan2(py - ry, px - rx) * (180/3.14159)) - rt;
-            dt = mod((dt + 180), 360) - 180
+            dt = mod((dt + 180), 360) - 180;
             dts = [dts; dt];
-            subplot(2,1,1);
-            plot(dts)
+%             subplot(2,1,1);
+%             plot(dts)
+            %dt = ([px - rx py - ry] * [cosd(rt) sind(rt)]') * sign(dt);
             pause(0.05)
         end
         disp('angle reached')

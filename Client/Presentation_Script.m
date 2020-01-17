@@ -12,24 +12,38 @@ try
  
 controller = SharpDX.XInput.Controller(SharpDX.XInput.UserIndex.One);
 
+global currentSensorPose;
+
 mode = "sim";
 
 if mode == "real"
     load('+data\sensorPoseReal.mat')
+    currentSensorPose = sensorPoseReal;
 else
     load('+data\sensorPose.mat')
+    currentSensorPose = sensorPose;
 end
+
+global particlesBody;
+numberOfParticles = 10000;
+
+global transBody;
+
+transBody = [0 0];
+
 
 try
     % Initialisierung
     utils.init_robot(mode);
     
+    particlesBody = utils.init_particle_filter(numberOfParticles);
     
+    fprintf('Script started. Commands with controller. -> left stick\n');
     % Main control loop. End with Ctrl + C in command line.
     while (true)
         % Controller Eingaben abfragen
         [trans, rot, button] = utils.get_pad_command(controller);
-        fprintf('%.2f, %.2f %s\n', trans, rot, button);
+        %fprintf('%.2f, %.2f %s\n', trans, rot, button);
         
         arrobot_setvel(trans)
         arrobot_setrotvel(-rot)
@@ -39,15 +53,34 @@ try
         ry = arrobot_gety;
         th = arrobot_getth;
         
+        
+        
         switch button
             case 'A'
                 fprintf('No functionality for %s\n', button);
+                
             case 'B'
                 fprintf('No functionality for %s\n', button);
+                
             case 'Y'
                 fprintf('No functionality for %s\n', button);
+                
             case 'Start'
-                fprintf('No functionality for %s\n', button);
+                fprintf('Start homing...\n')
+                arrobot_stop
+                pause(1)
+                distToHome = utils.get_docking_distance();
+                if distToHome < 5001
+                    homeReached = false;
+                    while ~homeReached && button ~= 'X'
+                        [~, ~, button] = utils.get_pad_command(controller);
+                        distToHome = utils.get_docking_distance();
+                        homeReached = robot_controls.drive_home(distToHome);
+                    end
+                else
+                    fprintf('Kann nicht homen weil nicht in range.\n')
+                end
+                
             case 'Back'
                 fprintf('No functionality for %s\n', button);
         end
