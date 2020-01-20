@@ -1,14 +1,17 @@
-u = udp('127.0.0.1', 4000);
+remoteHost = '192.168.137.248';
+
+global u;
+u = udp(remoteHost,'LocalPort', 4000);
 
 fopen(u);
 
 data = '';
 
-while string(data) ~= string('q')
-    fprintf('Waiting for data\n');
-    data = fread(u);
-    fprintf('Data incoming...\n');
-    disp(data)
+while data ~= string('q')
+    dist = utils.get_docking_distance([0 0]);
+    if dist ~= -1
+        disp(dist);
+    end
 end
 
 fclose(u);
