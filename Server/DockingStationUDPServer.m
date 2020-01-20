@@ -1,13 +1,13 @@
-u = udp('127.0.0.1', 4000);
+u = udp('192.168.137.175', 4000);
 
 fopen(u);
 
 in = '';
 
-while string(in) ~= string('q')
-    in = input('Data to be sent\n', 's')
-    fwrite(u, in);
-    disp(in)
+while true
+    fprintf('Sending...\n');
+    fwrite(u, [0 20]);
+    pause(2);
 end
 
 fclose(u);
