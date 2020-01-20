@@ -14,7 +14,7 @@ targetReached = false;
 px = target(1);
 py = target(2);
 
-dts = [];8
+dts = [];
 subplot(2,1,2)
 scatter(px, py, 'r*')
 hold on
