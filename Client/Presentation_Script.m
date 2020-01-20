@@ -31,13 +31,26 @@ global transBody;
 
 transBody = [0 0];
 
+% remoteHost = '192.168.137.1';
+% 
+% % global u;
+% % u = udp(remoteHost,'LocalPort', 4000);
+% global t;
+% t = tcpip('192.168.137.1', 3001, 'LocalHost', '192.168.137.175', 'LocalPort', 3000, 'NetworkRole', 'client');
+
 worldFigure = figure();
 occupancyFigure = figure();
+
+filename = '..\Resourcen\video.avi'
+writer = VideoWriter(filename);
+writer.FrameRate = 4;
 
 
 try
     % Initialisierung
     utils.init_robot(mode);
+    
+    recOn = false;
     
     xpositions = [];
     ypositions = [];
@@ -71,34 +84,56 @@ try
         wallsx = [wallsx; points(:, 1)];
         wallsy = [wallsy; points(:, 2)];
         
+        
+        % Zeige die aufgenommenen Punkte in plot.
+        figure(worldFigure);
+        scatter(wallsx, wallsy, 'b*')
+        hold on
+        scatter(xpositions, ypositions, 'r*')
+        figure(occupancyFigure);
+        length_points = length(points);
+        points_meter = points/1000;
+        setOccupancy(map, points_meter, ones(length_points,1));
+        show(map);
+        
+        if recOn
+            figure(worldFigure);
+            frame = getframe(gcf);
+            writeVideo(writer, frame);
+        end
+        
         switch button
             case 'A'
                 fprintf('No functionality for %s\n', button);
+                distToHome = utils.get_docking_distance([rx ry])
                 
             case 'B'
                 fprintf('No functionality for %s\n', button);
                 
             case 'Y'
-                % Zeige die aufgenommenen Punkte in plot.
-                figure(worldFigure);
-                scatter(wallsx, wallsy, 'b*')
-                hold on
-                scatter(xpositions, ypositions, 'r*')
-                figure(occupancyFigure);
-                length_points = length(points);
-                setOccupancy(map, points/1000+10, ones(length_points,1));
-                show(map);
+                if recOn
+                    fprintf('Recording ended...\n');
+                    recOn = false;
+                    close(writer);
+                else
+                    fprintf('Recording started...\n');
+                    recOn = true;
+                    open(writer);
+                end
+                
                 
             case 'Start'
                 fprintf('Start homing...\n')
                 arrobot_stop
                 pause(1)
-                distToHome = utils.get_docking_distance();
+%                 distToHome = utils.get_docking_distance([rx ry]);
                 if distToHome < 5001
                     homeReached = false;
                     while ~homeReached && button ~= 'X'
                         [~, ~, button] = utils.get_pad_command(controller);
-                        distToHome = utils.get_docking_distance();
+                        rx = arrobot_getx;
+                        ry = arrobot_gety;
+                        distToHome = utils.get_docking_distance([rx ry]);
                         homeReached = robot_controls.drive_home(distToHome);
                     end
                 else
@@ -121,6 +156,7 @@ catch err
     disp(err)
     arrobot_stop
     arrobot_disconnect
+    
 end
 
 arrobot_stop
