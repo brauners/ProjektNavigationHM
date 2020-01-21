@@ -10,15 +10,14 @@ try
      ex.ExceptionObject.LoaderExceptions.Get(0).Message
  end
  
-controller = SharpDX.XInput.Controller(SharpDX.XInput.UserIndex.One);
 
 global currentSensorPose;
 
-mode = "sim";
+mode = "real";
 
 if mode == "real"
     load('+data\sensorPoseReal.mat')
-    currentSensorPose = sensorPoseReal;
+    currentSensorPose = sensorPose;
 else
     load('+data\sensorPose.mat')
     currentSensorPose = sensorPose;
@@ -50,6 +49,8 @@ try
     % Initialisierung
     utils.init_robot(mode);
     
+    controller = SharpDX.XInput.Controller(SharpDX.XInput.UserIndex.One);
+    
     recOn = false;
     
     xpositions = [];
@@ -80,27 +81,27 @@ try
         xpositions = [xpositions; rx];
         ypositions = [ypositions; ry];
         
-        points = robot_controls.get_sensorreadings_worldframe(sensorPose);
-        wallsx = [wallsx; points(:, 1)];
-        wallsy = [wallsy; points(:, 2)];
+%         points = robot_controls.get_sensorreadings_worldframe(sensorPose);
+%         wallsx = [wallsx; points(:, 1)];
+%         wallsy = [wallsy; points(:, 2)];
         
         
         % Zeige die aufgenommenen Punkte in plot.
-        figure(worldFigure);
-        scatter(wallsx, wallsy, 'b*')
-        hold on
-        scatter(xpositions, ypositions, 'r*')
-        figure(occupancyFigure);
-        length_points = length(points);
-        points_meter = points/1000;
-        setOccupancy(map, points_meter, ones(length_points,1));
-        show(map);
+%         figure(worldFigure);
+%         scatter(wallsx, wallsy, 'b*')
+%         hold on
+%         scatter(xpositions, ypositions, 'r*')
+%         figure(occupancyFigure);
+%         length_points = length(points);
+%         points_meter = points/1000;
+%         setOccupancy(map, points_meter, ones(length_points,1));
+%         show(map);
         
-        if recOn
-            figure(worldFigure);
-            frame = getframe(gcf);
-            writeVideo(writer, frame);
-        end
+%         if recOn
+%             figure(worldFigure);
+%             frame = getframe(gcf);
+%             writeVideo(writer, frame);
+%         end
         
         switch button
             case 'A'
@@ -111,15 +112,15 @@ try
                 fprintf('No functionality for %s\n', button);
                 
             case 'Y'
-                if recOn
-                    fprintf('Recording ended...\n');
-                    recOn = false;
-                    close(writer);
-                else
-                    fprintf('Recording started...\n');
-                    recOn = true;
-                    open(writer);
-                end
+%                 if recOn
+%                     fprintf('Recording ended...\n');
+%                     recOn = false;
+%                     close(writer);
+%                 else
+%                     fprintf('Recording started...\n');
+%                     recOn = true;
+%                     open(writer);
+%                 end
                 
                 
             case 'Start'
