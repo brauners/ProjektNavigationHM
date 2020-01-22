@@ -13,7 +13,7 @@ try
 
 global currentSensorPose;
 
-mode = "sim";
+mode = "real";
 
 if mode == "real"
     load('+data\sensorPoseReal.mat')
@@ -86,9 +86,9 @@ try
         xpositions = [xpositions; rx];
         ypositions = [ypositions; ry];
         
-        points = robot_controls.get_sensorreadings_worldframe(sensorPose);
-        wallsx = [wallsx; points(:, 1)];
-        wallsy = [wallsy; points(:, 2)];
+%         points = robot_controls.get_sensorreadings_worldframe(sensorPose);
+%         wallsx = [wallsx; points(:, 1)];
+%         wallsy = [wallsy; points(:, 2)];
         
         
         % Zeige die aufgenommenen Punkte in plot.
@@ -106,11 +106,11 @@ try
         setOccupancy(map, points_meter, ones(length_points,1));
         show(map);
         
-        if recOn
-            figure(worldFigure);
-            frame = getframe(gcf);
-            writeVideo(writer, frame);
-        end
+%         if recOn
+%             figure(worldFigure);
+%             frame = getframe(gcf);
+%             writeVideo(writer, frame);
+%         end
         
         switch button
             case 'A'
@@ -122,15 +122,15 @@ try
                 input('Paused. Continue with Enter')
                 
             case 'Y'
-                if recOn
-                    fprintf('Recording ended...\n');
-                    recOn = false;
-                    close(writer);
-                else
-                    fprintf('Recording started...\n');
-                    recOn = true;
-                    open(writer);
-                end
+%                 if recOn
+%                     fprintf('Recording ended...\n');
+%                     recOn = false;
+%                     close(writer);
+%                 else
+%                     fprintf('Recording started...\n');
+%                     recOn = true;
+%                     open(writer);
+%                 end
                 
                 
             case 'Start'
