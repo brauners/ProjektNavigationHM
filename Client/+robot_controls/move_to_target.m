@@ -5,7 +5,7 @@ function [targetReached] = move_to_target(target, sensorPose)
 disp('start moving')
 
 velMult = 0.4
-distThresh = 100 % mm
+distThresh = 200 % mm
 angleThresh = 5 % deg
 
 targetReached = false;

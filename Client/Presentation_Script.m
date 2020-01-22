@@ -10,7 +10,6 @@ try
      ex.ExceptionObject.LoaderExceptions.Get(0).Message
  end
  
-controller = SharpDX.XInput.Controller(SharpDX.XInput.UserIndex.One);
 
 global currentSensorPose;
 
@@ -18,7 +17,7 @@ mode = "sim";
 
 if mode == "real"
     load('+data\sensorPoseReal.mat')
-    currentSensorPose = sensorPoseReal;
+    currentSensorPose = sensorPose;
 else
     load('+data\sensorPose.mat')
     currentSensorPose = sensorPose;
@@ -50,6 +49,8 @@ try
     % Initialisierung
     utils.init_robot(mode);
     
+    controller = SharpDX.XInput.Controller(SharpDX.XInput.UserIndex.One);
+    
     recOn = false;
     
     xpositions = [];
@@ -67,10 +68,15 @@ try
     while (true)
         % Controller Eingaben abfragen
         [trans, rot, button] = utils.get_pad_command(controller);
-        %fprintf('%.2f, %.2f %s\n', trans, rot, button);
+        fprintf('%.2f, %.2f %s\n', trans, rot, button);
         
         arrobot_setvel(trans)
         arrobot_setrotvel(-rot)
+        
+        collision = robot_controls.collision_detection(50, currentSensorPose);
+        if collision && button ~= 'Back'
+            arrobot_stop
+        end
         
         % Roboter Pose abfragen.
         rx = arrobot_getx;
@@ -87,9 +93,13 @@ try
         
         % Zeige die aufgenommenen Punkte in plot.
         figure(worldFigure);
-        scatter(wallsx, wallsy, 'b*')
+        scatter(wallsx/1000, wallsy/1000, 'b*')
         hold on
-        scatter(xpositions, ypositions, 'r*')
+        scatter(xpositions/1000, ypositions/1000, 'r*')
+        title('Detected obstacles in world frame')
+        xlabel('Y-Coordinate [m]')
+        ylabel('X-Coordinate [m]')
+        
         figure(occupancyFigure);
         length_points = length(points);
         points_meter = points/1000;
@@ -109,6 +119,7 @@ try
                 
             case 'B'
                 fprintf('No functionality for %s\n', button);
+                input('Paused. Continue with Enter')
                 
             case 'Y'
                 if recOn
@@ -140,8 +151,25 @@ try
                     fprintf('Kann nicht homen weil nicht in range.\n')
                 end
                 
-            case 'Back'
+            case 'DPadUp'
+%                 fprintf('No functionality for %s\n', button);
+                target = [1000 0];
+                robot_controls.move_to_target(target, sensorPose);
+                
+            case 'DPadDown'
                 fprintf('No functionality for %s\n', button);
+                
+                
+            case 'DPadLeft'
+%                 fprintf('No functionality for %s\n', button);
+                target = [1000 1000];
+                robot_controls.move_to_target(target, sensorPose);
+                
+            case 'DPadRight'
+%                 fprintf('No functionality for %s\n', button);
+                target = [1000 -1000];
+                robot_controls.move_to_target(target, sensorPose);
+                
         end
         
         if button == 'X'

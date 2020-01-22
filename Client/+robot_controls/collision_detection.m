@@ -13,7 +13,7 @@ for i = 1 : n
     if val < threshold 
         collision = true;
         angle = sensorPose(i,3);
-        fprintf("Achtung Kollisionsgefahr!!! Distanz: %.2f, Winkel: %.2f", val, angle);
+        fprintf("Achtung Kollisionsgefahr!!! Distanz: %.2f, Winkel: %.2f\n", val, angle);
         break;
     end
 end

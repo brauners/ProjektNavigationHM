@@ -50,7 +50,7 @@ try
         measurement = utils.euclidean(realHomeWorld, robotPoseWorld(1:2));
         
         % Calculate the particles in body frame
-        [homeBody, particlesBody] = robot_controls.expected_home(particlesBody, measurement, transBody, rot, body);
+        [homeBody, particlesBody] = robot_controls.expected_home(particlesBody, measurement, transBody, rot);
         
         % Convert to world coordinates
         homeWorld = robot_controls.local_to_world_frame(homeBody, robotPoseWorld(3), robotPoseWorld(1:2));
@@ -64,6 +64,9 @@ try
         scatter(robotPoseWorld(1), robotPoseWorld(2))
         scatter(homeWorld(1), homeWorld(2), 'k*');
         scatter(realHomeWorld(1), realHomeWorld(2), 'y+')
+        title('Estimated home position in world frame')
+        xlabel('X-Coordinate in mm');
+        ylabel('Y-Coordinate in mm');
         
         
         figure(body);
@@ -73,7 +76,7 @@ try
         scatter(homeBody(1), homeBody(2), 'ko')
         
         if i == 1
-            transBody = homeBody;
+            transBody = homeBody/2;
         else
             transBody = homeBody/3;
         end
