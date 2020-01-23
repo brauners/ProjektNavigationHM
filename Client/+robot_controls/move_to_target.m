@@ -8,6 +8,8 @@ velMult = 0.4
 distThresh = 200 % mm
 angleThresh = 5 % deg
 
+global collThresh
+
 targetReached = false;
 
 [startX startY startT] = arrobot_getpose;
@@ -20,7 +22,7 @@ dts = [];
 % hold on
 
 while(~targetReached)
-    collision = robot_controls.collision_detection(300, sensorPose);
+    collision = robot_controls.collision_detection(collThresh, sensorPose);
     if collision
         arrobot_stop
         targetReached = false;
@@ -66,7 +68,7 @@ while(~targetReached)
         if abs(d) > distThresh
             fprintf('%.2f  %.2f; d: %.2f\n', rx, ry, d);
             %arrobot_setvel(d*velMult)
-            arrobot_setvel(80)
+            arrobot_setvel(50)
         else
             disp('stop')
             arrobot_stop

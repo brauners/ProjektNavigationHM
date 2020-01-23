@@ -3,6 +3,10 @@ addpath('..\..\ARIA_2.9.1 (64-bit)_matlab_precompiled');
 clear all
 addpath('..\..\ARIA_2.9.1 (64-bit)_matlab_precompiled');
 
+[y, Fs] = audioread('..\Resourcen\collision.m4a');
+global player;
+player = audioplayer(y,Fs);
+
 try
     library = NET.addAssembly([pwd '\SharpDX.dll']);
     controllerLibrary = NET.addAssembly([pwd '\SharpDX.XInput.dll']);
@@ -28,6 +32,9 @@ numberOfParticles = 10000;
 
 global transBody;
 
+global collThresh
+collThresh = 300;
+
 transBody = [0 0];
 
 % remoteHost = '192.168.137.1';
@@ -44,7 +51,7 @@ filename = '..\Resourcen\video.avi'
 writer = VideoWriter(filename);
 writer.FrameRate = 4;
 
-
+input('Start script with enter...')
 try
     % Initialisierung
     utils.init_robot(mode);
@@ -70,14 +77,20 @@ try
         [trans, rot, button] = utils.get_pad_command(controller);
         fprintf('%.2f, %.2f %s\n', trans, rot, button);
         
+        if button == 'RightShoulder'
+            trans = trans*4;
+        end
+        
         arrobot_setvel(trans)
         arrobot_setrotvel(-rot)
         
-        collision = robot_controls.collision_detection(50, currentSensorPose);
+%         fprintf('check collision\n')
+        collision = robot_controls.collision_detection(collThresh, currentSensorPose);
         if collision && button ~= 'Back'
             arrobot_stop
         end
         
+%         fprintf('get pose\n')
         % Roboter Pose abfragen.
         rx = arrobot_getx;
         ry = arrobot_gety;
@@ -86,11 +99,15 @@ try
         xpositions = [xpositions; rx];
         ypositions = [ypositions; ry];
         
-%         points = robot_controls.get_sensorreadings_worldframe(sensorPose);
-%         wallsx = [wallsx; points(:, 1)];
-%         wallsy = [wallsy; points(:, 2)];
+%         fprintf('reading sensor\n')
+        points = robot_controls.get_sensorreadings_worldframe(currentSensorPose);
         
+        if ~isempty(points)
+            wallsx = [wallsx; points(:, 1)];
+            wallsy = [wallsy; points(:, 2)];
+        end
         
+%         fprintf('plotting\n')
         % Zeige die aufgenommenen Punkte in plot.
         figure(worldFigure);
         scatter(wallsx/1000, wallsy/1000, 'b*')
@@ -100,17 +117,20 @@ try
         xlabel('Y-Coordinate [m]')
         ylabel('X-Coordinate [m]')
         
-        figure(occupancyFigure);
-        length_points = length(points);
-        points_meter = points/1000;
-        setOccupancy(map, points_meter, ones(length_points,1));
-        show(map);
+%         fprintf('plotting occ\n')
+        if ~isempty(points)
+            figure(occupancyFigure);
+            length_points = length(points);
+            points_meter = points/1000;
+            setOccupancy(map, points_meter, ones(length_points,1));
+            show(map);
+        end
         
-%         if recOn
-%             figure(worldFigure);
-%             frame = getframe(gcf);
-%             writeVideo(writer, frame);
-%         end
+        if recOn
+            figure(worldFigure);
+            frame = getframe(gcf);
+            writeVideo(writer, frame);
+        end
         
         switch button
             case 'A'
@@ -122,15 +142,15 @@ try
                 input('Paused. Continue with Enter')
                 
             case 'Y'
-%                 if recOn
-%                     fprintf('Recording ended...\n');
-%                     recOn = false;
-%                     close(writer);
-%                 else
-%                     fprintf('Recording started...\n');
-%                     recOn = true;
-%                     open(writer);
-%                 end
+                if recOn
+                    fprintf('Recording ended...\n');
+                    recOn = false;
+                    close(writer);
+                else
+                    fprintf('Recording started...\n');
+                    recOn = true;
+                    open(writer);
+                end
                 
                 
             case 'Start'
@@ -153,7 +173,7 @@ try
                 
             case 'DPadUp'
 %                 fprintf('No functionality for %s\n', button);
-                target = [1000 0];
+                target = [3000 0];
                 robot_controls.move_to_target(target, sensorPose);
                 
             case 'DPadDown'
