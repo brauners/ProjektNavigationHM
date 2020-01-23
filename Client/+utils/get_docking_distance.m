@@ -2,20 +2,20 @@ function [distance] = get_docking_distance(robotPos)
 %GET_DOCKING_DISTANCE Summary of this function goes here
 %   Detailed explanation goes here
 
-global u;
+% global u;
+% fopen(u);
+% 
+% global t;
+% fopen(t);
+% robotPos
+% fwrite(t, robotPos, 'double')
 
-distance = -1;
-num = u.BytesAvailable();
-if num == 2
-    data = fread(u, num);
-    tmp = euclidean(data, robotPos);
-    if tmp < 5000
-        distance = tmp;
-    end
-else
-%     flushinput(u);
-end
+distance = euclidean([0 0], robotPos);
 
+
+
+% fclose(t);
+% fclose(u);
 
 end
 

@@ -8,7 +8,7 @@ pause(0.5)
 aria_shutdown
 
 if mode == "real"
-    aria_init -rp COM3
+    aria_init -rp COM4
 else
     aria_init
 end

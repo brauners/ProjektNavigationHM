@@ -13,9 +13,9 @@ sensor_values = zeros(n, 1);
 for i = 1 : n
     val = arrobot_getsonarrange(i-1);
     if val ~= 5000
-        rx = arrobot_getx
-        ry = arrobot_gety
-        th = arrobot_getth
+        rx = arrobot_getx;
+        ry = arrobot_gety;
+        th = arrobot_getth;
         [x, y] = polar_to_kart(val, sensorPose(i, 3));
         % Apply correct position of the sensor
         x = x + sensorPose(i, 1)*1000;
