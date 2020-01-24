@@ -35,8 +35,6 @@ arrobot_connect
 % arrobot_setrotvel(35)
 
 
-%% Sonar einlesen
-% sonar = load('Sonar.txt');
 
 %%Aktuelle Postition des Roboters abfragen
 x = arrobot_getx();
@@ -54,8 +52,12 @@ for i=1:10
 end
 
 
+
+
+
+
 %% simple Steuerung
-while (true)
+ while (true)
 reply = input('Enter control command \r\n', 's');
  switch reply
      
