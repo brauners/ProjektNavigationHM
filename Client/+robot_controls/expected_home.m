@@ -1,5 +1,6 @@
 function [home, particles] = expected_home(particles, measurement, trans, rot)
-%FIND_HOME Summary of this function goes here
+%FIND_HOME Calculates a possible home position. Uses a range only particle
+%filter.
 % Particles initialized outside
 % Measurement on current position
 % Motion is robot movement to new position
@@ -8,9 +9,6 @@ mutateRandoms = 0;
 mutatePos = 50;
 potSize = 10000;
 
-
-% Move each particle CONTRARY to robot motion
-% First rot then trans
 for i = 1 : length(particles)
     particles(i, 1:2) = motion(particles(i, 1:2), rot, trans);
 end
@@ -65,9 +63,6 @@ w = normpdf(innovation, 0, sigma_measurement);
 end
 
 function [pot] = fill_pot(particles, potSize)
-%FILL_POTSummary of this function goes here
-%   Detailed explanation goes here
-%pot = zeros(potSize, 1);
 pot = [];
 
 for p = 1 : size(particles,1)
@@ -81,9 +76,6 @@ end
 end
 
 function [gen] = make_generation(pot, genSize)
-%MAKEGENERATION Summary of this function goes here
-%   Detailed explanation goes here
-
 gen = zeros(genSize, size(pot,2));
 potSize = size(pot,1);
 
@@ -95,8 +87,6 @@ end
 end
 
 function [gen] = mutate(gen, xy, randomPoints)
-%MUTATE Summary of this function goes here
-%   Detailed explanation goes here
 maxX = 4000;
 maxY = 4000;
 
@@ -113,8 +103,6 @@ end
 end
 
 function [pos_est] = ransac(particles)
-%RANSAC Summary of this function goes here
-%   Detailed explanation goes here
 iterations = 10;
 range = 1;
 

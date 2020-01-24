@@ -1,5 +1,5 @@
 function [pointcloud, pose] = get_sensorreadings(sensorPose)
-%GET_SENSORREADINGS Reads the sonar sensor and returns a pointcloud of
+%GET_SENSORREADINGS Reads the sonar sensor and returns a 2D-pointcloud of
 %detected objects around the robot in body coordinate system of the robot
 %Unit is in mm
 

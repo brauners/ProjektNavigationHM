@@ -1,6 +1,7 @@
 function [targetReached] = move_to_target(target, sensorPose)
 %MOVE_TO_TARGET Moves the robot to a target position relative to current
-%position
+%position. Continuously checks distance and angle to target and adjusts the
+%pose.
 
 disp('start moving')
 
@@ -17,9 +18,6 @@ px = target(1);
 py = target(2);
 
 dts = [];
-% subplot(2,1,2)
-% scatter(px, py, 'r*')
-% hold on
 
 while(~targetReached)
     collision = robot_controls.collision_detection(collThresh, sensorPose);
@@ -31,8 +29,6 @@ while(~targetReached)
     %Move forward to the target but check if angle gets off
     rx = arrobot_getx - startX;
     ry = arrobot_gety - startY;
-%     subplot(2,1,2)
-%     scatter(rx, ry, 'b*')
     pause(0.2)
     
     d = sqrt( (px - rx)^2 + (py - ry)^2 );
@@ -41,8 +37,6 @@ while(~targetReached)
     dt =  (atan2(py - ry, px - rx) * (180/3.14159)) - rt;
     dt = mod((dt + 180), 360) - 180;
     dts = [dts; dt];
-%     subplot(2,1,1);
-%     plot(dts)
     
     %Turn towards the target if over threshold
     if abs(dt) > angleThresh
@@ -56,8 +50,6 @@ while(~targetReached)
             dt =  (atan2(py - ry, px - rx) * (180/3.14159)) - rt;
             dt = mod((dt + 180), 360) - 180;
             dts = [dts; dt];
-%             subplot(2,1,1);
-%             plot(dts)
             %dt = ([px - rx py - ry] * [cosd(rt) sind(rt)]') * sign(dt);
             pause(0.05)
         end
@@ -74,7 +66,6 @@ while(~targetReached)
             arrobot_stop
             targetReached = true;
         end
-        %pause(0.2)
     end
     pause(0.1)
 end

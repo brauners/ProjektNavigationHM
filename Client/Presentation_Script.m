@@ -1,24 +1,25 @@
+%% Lade die Bibliothek zur Verbindung mir dem Roboter
 close all;
 addpath('..\..\ARIA_2.9.1 (64-bit)_matlab_precompiled');
 clear all
 addpath('..\..\ARIA_2.9.1 (64-bit)_matlab_precompiled');
 
-[y, Fs] = audioread('..\Resourcen\collision.m4a');
-global player;
-player = audioplayer(y,Fs);
-
+%% Lade die Bibliothek zur Verbindung zum Gamepad
 try
     library = NET.addAssembly([pwd '\SharpDX.dll']);
     controllerLibrary = NET.addAssembly([pwd '\SharpDX.XInput.dll']);
  catch ex
      ex.ExceptionObject.LoaderExceptions.Get(0).Message
- end
+end
  
+%% Initialisiere Variablen die global benötigt werden
+[y, Fs] = audioread('..\Resourcen\collision.m4a');
+global player;
+player = audioplayer(y,Fs);
 
 global currentSensorPose;
 
 mode = "real";
-
 if mode == "real"
     load('+data\sensorPoseReal.mat')
     currentSensorPose = sensorPose;
@@ -37,13 +38,7 @@ collThresh = 300;
 
 transBody = [0 0];
 
-% remoteHost = '192.168.137.1';
-% 
-% % global u;
-% % u = udp(remoteHost,'LocalPort', 4000);
-% global t;
-% t = tcpip('192.168.137.1', 3001, 'LocalHost', '192.168.137.175', 'LocalPort', 3000, 'NetworkRole', 'client');
-
+%% Benötigte Variablen zur Darstellung
 worldFigure = figure();
 occupancyFigure = figure();
 
@@ -51,13 +46,15 @@ filename = '..\Resourcen\video.avi'
 writer = VideoWriter(filename);
 writer.FrameRate = 4;
 
-input('Start script with enter...')
+% input('Start script with enter...')
 try
-    % Initialisierung
+    %% Initialisierung des Roboters abhängig vom Modus (Real - Simulation)
     utils.init_robot(mode);
     
+    %% Gamepad zur Steuerung
     controller = SharpDX.XInput.Controller(SharpDX.XInput.UserIndex.One);
     
+    %% Vorbereitung weiterer beötigter Variablen
     recOn = false;
     
     xpositions = [];
@@ -71,35 +68,32 @@ try
     particlesBody = utils.init_particle_filter(numberOfParticles);
     
     fprintf('Script started. Commands with controller. -> left stick\n');
-    % Main control loop. End with Ctrl + C in command line.
+    %% Hauptkontrollschleife. Beende mit X auf dem Gamepad
     while (true)
-        % Controller Eingaben abfragen
+        %% Controller Eingaben abfragen
         [trans, rot, button] = utils.get_pad_command(controller);
         fprintf('%.2f, %.2f %s\n', trans, rot, button);
         
         if button == 'RightShoulder'
-            trans = trans*4;
+            trans = trans*2;
         end
         
+        %% Setze Bewegungsbefehle
         arrobot_setvel(trans)
         arrobot_setrotvel(-rot)
         
-%         fprintf('check collision\n')
+        %% Kontrolliere auf Kollisionsgefahr
         collision = robot_controls.collision_detection(collThresh, currentSensorPose);
         if collision && button ~= 'Back'
             arrobot_stop
         end
         
-%         fprintf('get pose\n')
-        % Roboter Pose abfragen.
+        %% Roboter Pose abfragen.
         rx = arrobot_getx;
         ry = arrobot_gety;
         th = arrobot_getth;
         
-        xpositions = [xpositions; rx];
-        ypositions = [ypositions; ry];
-        
-%         fprintf('reading sensor\n')
+        %% Lese die Sensoren und setze Objekte in Karte
         points = robot_controls.get_sensorreadings_worldframe(currentSensorPose);
         
         if ~isempty(points)
@@ -107,8 +101,10 @@ try
             wallsy = [wallsy; points(:, 2)];
         end
         
-%         fprintf('plotting\n')
-        % Zeige die aufgenommenen Punkte in plot.
+        xpositions = [xpositions; rx];
+        ypositions = [ypositions; ry];
+        
+        %% Darstellung der Karte
         figure(worldFigure);
         scatter(wallsx/1000, wallsy/1000, 'b*')
         hold on
@@ -117,7 +113,7 @@ try
         xlabel('Y-Coordinate [m]')
         ylabel('X-Coordinate [m]')
         
-%         fprintf('plotting occ\n')
+        %% Darstellung des Occupancy Grids
         if ~isempty(points)
             figure(occupancyFigure);
             length_points = length(points);
@@ -126,12 +122,14 @@ try
             show(map);
         end
         
+        %% Möglichkeit zum Aufnehmen der aktuellen Karte in einem Video
         if recOn
             figure(worldFigure);
             frame = getframe(gcf);
             writeVideo(writer, frame);
         end
         
+        %% Verarbeite zusätzliche Eingaben am Gamepad
         switch button
             case 'A'
                 fprintf('No functionality for %s\n', button);
@@ -142,6 +140,7 @@ try
                 input('Paused. Continue with Enter')
                 
             case 'Y'
+                % Toggle recording
                 if recOn
                     fprintf('Recording ended...\n');
                     recOn = false;
@@ -157,7 +156,6 @@ try
                 fprintf('Start homing...\n')
                 arrobot_stop
                 pause(1)
-%                 distToHome = utils.get_docking_distance([rx ry]);
                 if distToHome < 5001
                     homeReached = false;
                     while ~homeReached && button ~= 'X'
@@ -171,15 +169,11 @@ try
                     fprintf('Kann nicht homen weil nicht in range.\n')
                 end
                 
+            % Starte Bewegung zu Zielpunkt
             case 'DPadUp'
-%                 fprintf('No functionality for %s\n', button);
-                target = [3000 0];
+                target = [2000 0];
                 robot_controls.move_to_target(target, sensorPose);
-                
-            case 'DPadDown'
-                fprintf('No functionality for %s\n', button);
-                
-                
+
             case 'DPadLeft'
 %                 fprintf('No functionality for %s\n', button);
                 target = [1000 1000];
@@ -192,6 +186,7 @@ try
                 
         end
         
+        % Beende die Kontrollschleife
         if button == 'X'
             arrobot_stop
             break;
@@ -200,6 +195,7 @@ try
     end
     
 catch err
+    %% Beende die Verbindung falls ein Fehler auftritt
     disp 'error or cancelled'
     disp(err)
     arrobot_stop
@@ -207,5 +203,15 @@ catch err
     
 end
 
+%% Beende die Verbindung falls Abbruch durch Benutzer
 arrobot_stop
 arrobot_disconnect
+
+%% Aufgerufene eigene Funktionen
+%% init_robot
+%% init_particle_filter
+%% get_pad_command
+%% collision_detection
+%% get_sensorreadings_worldframe
+%% get_docking_distance
+%% move_to_target

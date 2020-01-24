@@ -1,6 +1,6 @@
 function [pointcloud] = get_sensorreadings_worldframe(sensorPose)
-%GET_SENSORREADINGS_WORLDFRAME Gets the points from the sensor in the world
-%frame
+%GET_SENSORREADINGS_WORLDFRAME Gets the points from the sensor in the body
+%frame and returns detected obstacles in a 2D-pointcloud in world frame
 
 [pointcloud, pose] = robot_controls.get_sensorreadings(sensorPose);
 

@@ -19,6 +19,8 @@ for i = 1 : n
         break;
     end
 end
+
+% Auditive Signalisierung 
 if collision
     if ~isplaying(player)
         play(player);

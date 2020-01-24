@@ -1,6 +1,6 @@
 function [distance] = get_docking_distance(robotPos)
-%GET_DOCKING_DISTANCE Summary of this function goes here
-%   Detailed explanation goes here
+%GET_DOCKING_DISTANCE Simulate a dockingstation on position 0, 0 and return
+%the distance to it
 
 % global u;
 % fopen(u);
